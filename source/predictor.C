@@ -105,7 +105,7 @@ void init_predictor_alpha21264()
 		gPred[i] = 1;
 	}
 
-	pht_length = 1 << pcIndexBits;
+	pht_length = 1 << pcBits;
 	pht_mask = pht_length - 1;
 	PHT = (int*)malloc(pht_length * sizeof(int));
 	for (int i = 0; i< pht_length; i++) {
@@ -163,8 +163,8 @@ bool make_prediction_local(unsigned int pc) {
 
 bool make_prediction_gshare(unsigned int pc)
 {
-	int xor = (GHR^pc) & bht_mask;
-	if (BHT[xor] > 1) {
+	int xr = (GHR^pc) & bht_mask;
+	if (BHT[xr] > 1) {
 		return TAKEN;
 	}
 	return NOTTAKEN;
@@ -248,19 +248,19 @@ void train_predictor_local(unsigned int pc, bool outcome) {
 
 void train_predictor_gshare(unsigned int pc, bool outcome)
 {
-	int xor = (GHR^pc) & bht_mask;
+	int xr = (GHR^pc) & bht_mask;
 	if (outcome == TAKEN) {
-		BHT[xor]++;
+		BHT[xr]++;
 	}
 	else {
-		BHT[xor]--;
+		BHT[xr]--;
 	}
 
-	if (BHT[xor] > 3) {
-		BHT[xor] = 3;
+	if (BHT[xr] > 3) {
+		BHT[xr] = 3;
 	}
-	else if (BHT[xor] < 0) {
-		BHT[xor] = 0;
+	else if (BHT[xr] < 0) {
+		BHT[xr] = 0;
 	}
 
 	GHR <<= 1;
