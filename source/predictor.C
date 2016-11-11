@@ -38,22 +38,26 @@ int GHR = 0;
 
 int* BHT;
 int* PHT;
+int* gPred;
+int* choice;
 
 int bht_mask = 0;
 int pht_mask = 0;
 int bht_length = 0;
 int pht_length = 0;
+int gPred_length = 0;
+int choice_len = 0;
 
 void init_predictor ()
 {
 	switch (predictorType) {
 		case DEFAULT:
 			break;
-		case GSHARE:
-			init_predictor_gshare();
-			break;
 		case LOCAL:
 			init_predictor_local();
+			break;
+		case GSHARE:
+			init_predictor_gshare();
 			break;
 		case ALPHA21264:
 			init_predictor_alpha21264();
@@ -82,19 +86,60 @@ void init_predictor_local() {
 	}
 }
 
-void init_predictor_alpha21264(){}
-void init_predictor_perceptron(){}
-void init_predictor_gshare(){}
+void init_predictor_gshare()
+{
+	bht_length = 1 << globalhistBits;
+	bht_mask = (1 << globalhistBits) - 1;
+	BHT = (int*)malloc(bht_length * sizeof(int));
+	for (int i = 0; i< bht_length; i++) {
+		BHT[i] = 1;
+	}
+}
+
+void init_predictor_alpha21264()
+{
+	GHR = 0;
+	gPred_length = 1 << globalhistBits;
+	gPred = (int*)malloc(gPred_length * sizeof(int));
+	for (int i = 0; i< gPred_length; i++) {
+		gPred[i] = 1;
+	}
+
+	pht_length = 1 << pcIndexBits;
+	pht_mask = pht_length - 1;
+	PHT = (int*)malloc(pht_length * sizeof(int));
+	for (int i = 0; i< pht_length; i++) {
+		PHT[i] = 0;
+	}
+
+	bht_length = 1 << localhistBits;
+	bht_mask = bht_length - 1;
+	BHT = (int*)malloc(bht_length * sizeof(int));
+	for (int i = 0; i< bht_length; i++) {
+		BHT[i] = 1;
+	}
+
+	choice_len = 1 << globalhistBits;
+	choice = (int*)malloc(choice_len * sizeof(int));
+	for (int i = 0; i< choice_len; i++) {
+		choice[i] = 1;
+	}
+}
+
+void init_predictor_perceptron()
+{
+//TODO
+}
 
 bool make_prediction (unsigned int pc)
 {
 	switch (predictorType) {
 		case DEFAULT:
 			return TAKEN;
-		case GSHARE:
-			return make_prediction_gshare(pc);
 		case LOCAL:
 			return make_prediction_local(pc);
+		case GSHARE:
+			return make_prediction_gshare(pc);
 		case ALPHA21264:
 			return make_prediction_alpha21264(pc);
 		case PERCEPTRON:
@@ -116,20 +161,54 @@ bool make_prediction_local(unsigned int pc) {
 	return NOTTAKEN;
 }
 
-bool make_prediction_gshare(unsigned int pc){}
-bool make_prediction_alpha21264(unsigned int pc){}
-bool make_prediction_perceptron(unsigned int pc){}
+bool make_prediction_gshare(unsigned int pc)
+{
+	int xor = (GHR^pc) & bht_mask;
+	if (BHT[xor] > 1) {
+		return TAKEN;
+	}
+	return NOTTAKEN;
+}
+
+bool make_prediction_alpha21264(unsigned int pc)
+{
+	int lResult = NOTTAKEN;
+	int iPHT = pc & pht_mask;
+	int iBHT = PHT[iPHT] & bht_mask;
+	if (BHT[iBHT] > 1) {
+		lResult = TAKEN;
+	}
+
+	int gResult = NOTTAKEN;
+	int index = GHR & (choice_len - 1);
+
+	if (gPred[index] > 1) {
+		gResult = TAKEN;
+	}
+
+	if (choice[index] > 1) {
+		return lResult;
+	}
+	else {
+		return gResult;
+	}
+}
+
+bool make_prediction_perceptron(unsigned int pc)
+{
+//TODO
+}
 
 void train_predictor (unsigned int pc, bool outcome)
 {
 	switch (predictorType) {
 		case DEFAULT:
 			return;
-		case GSHARE:
-			train_predictor_gshare(pc, outcome);
-			return;
 		case LOCAL:
 			train_predictor_local(pc, outcome);
+			return;
+		case GSHARE:
+			train_predictor_gshare(pc, outcome);
 			return;
 		case ALPHA21264:
 			train_predictor_alpha21264(pc, outcome);
@@ -167,9 +246,89 @@ void train_predictor_local(unsigned int pc, bool outcome) {
 	}
 }
 
-void train_predictor_gshare(unsigned int pc, bool outcome){}
-void train_predictor_alpha21264(unsigned int pc, bool outcome){}
-void train_predictor_perceptron(unsigned int pc, bool outcome){}
+void train_predictor_gshare(unsigned int pc, bool outcome)
+{
+	int xor = (GHR^pc) & bht_mask;
+	if (outcome == TAKEN) {
+		BHT[xor]++;
+	}
+	else {
+		BHT[xor]--;
+	}
+
+	if (BHT[xor] > 3) {
+		BHT[xor] = 3;
+	}
+	else if (BHT[xor] < 0) {
+		BHT[xor] = 0;
+	}
+
+	GHR <<= 1;
+	GHR &= bht_mask;
+	if (outcome == TAKEN) {
+		GHR += 1;
+	}
+}
+
+void train_predictor_alpha21264(unsigned int pc, bool outcome)
+{
+	int lResult = NOTTAKEN;
+	int iPHT = pc & pht_mask;
+	int iBHT = PHT[iPHT] & bht_mask;
+	if (BHT[iBHT] > 1) {
+		lResult = TAKEN;
+	}
+
+	int gResult = NOTTAKEN;
+	int index = GHR & (choice_len - 1);
+
+	if (gPred[index] > 1) {
+		gResult = TAKEN;
+	}
+
+	int choiceAdd = GHR & (choice_len - 1);
+
+	if (gResult == outcome && lResult != outcome) {
+		choice[choiceAdd]--;
+	}
+	else if (gResult != outcome && lResult == outcome) {
+		choice[choiceAdd]++;
+	}
+
+	if (choice[choiceAdd] > 3) {
+		choice[choiceAdd] = 3;
+	}
+	else if (choice[choiceAdd] < 0) {
+		choice[choiceAdd] = 0;
+	}
+
+	if (outcome == TAKEN) {
+		gPred[choiceAdd]++;
+	}
+	else {
+		gPred[choiceAdd]--;
+	}
+
+	if (gPred[choiceAdd] > 3) {
+		gPred[choiceAdd] = 3;
+	}
+	else if (gPred[choiceAdd] < 0) {
+		gPred[choiceAdd] = 0;
+	}
+
+	GHR <<= 1;
+	GHR &= (choice_len - 1);
+	if (outcome == TAKEN) {
+		GHR += 1;
+	}
+
+	train_predictor_local(pc, outcome);
+}
+
+void train_predictor_perceptron(unsigned int pc, bool outcome)
+{
+//TODO
+}
 
 
 int MAX(int x, int y)
