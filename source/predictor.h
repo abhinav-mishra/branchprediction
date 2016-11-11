@@ -1,6 +1,9 @@
 #ifndef PREDICTOR_H
 #define PREDICTOR_H
 
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 /*
   Define all your tables and their sizes here.
   All tables must be statically-sized.
@@ -14,6 +17,27 @@
   concerned about the memory used by the simulated branch predictor.
 */
 
+#define NOTTAKEN  false
+#define TAKEN     true
+
+// Different Predictor Types
+#define DEFAULT      0
+#define GSHARE      1
+#define LOCAL       2
+#define ALPHA21264  3
+#define PERCEPTRON  4
+extern const char *predictorName[];
+
+#define StrongNT  0			// strong not taken
+#define WeakNT  1			// weak not taken
+#define WeakT  2			// weak taken
+#define StrongT  3			// strong taken
+
+// Predictor Configuration
+extern int globalhistBits;      // Number of bits for Global History
+extern int localhistBits;       // Number of bits for Local History
+extern int pcBits;              // Number of bits for PC index
+extern int predictorType;       // Branch Predictor Type
 
 
 
