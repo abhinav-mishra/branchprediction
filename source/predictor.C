@@ -70,8 +70,10 @@ void init_predictor ()
 		}
 }
 
-void init_predictor_local() {
-	pht_length = 1 << pcBits;
+void init_predictor_local() 
+{
+    int sizeinbits = 0;
+    pht_length = 1 << pcBits;
 	pht_mask = pht_length - 1;
 	PHT = (int*)malloc(pht_length * sizeof(int));
 	for (int i = 0; i< pht_length; i++) {
@@ -82,23 +84,30 @@ void init_predictor_local() {
 	bht_mask = bht_length - 1;
 	BHT = (int*)malloc(bht_length * sizeof(int));
 	for (int i = 0; i< bht_length; i++) {
-		BHT[i] = 1;
+		BHT[i] = 0;
 	}
+    sizeinbits = (pht_length*localhistBits)+(bht_length * 2);
+    printf("sizeinbits = %d+%d = %d \n", (pht_length * localhistBits), (bht_length * 2), sizeinbits);
 }
 
 void init_predictor_gshare()
 {
-	bht_length = 1 << globalhistBits;
+	int sizeinbits = 0;
+    GHR = 0;
+    bht_length = 1 << globalhistBits;
 	bht_mask = (1 << globalhistBits) - 1;
 	BHT = (int*)malloc(bht_length * sizeof(int));
 	for (int i = 0; i< bht_length; i++) {
-		BHT[i] = 1;
+		BHT[i] = 0;
 	}
+    sizeinbits = (globalhistBits)+(bht_length * 2);
+    printf("sizeinbits = %d+%d = %d \n", (globalhistBits), (bht_length * 2), sizeinbits);
 }
 
 void init_predictor_alpha21264()
 {
-	GHR = 0;
+	int sizeinbits = 0;
+    GHR = 0;
 	gPred_length = 1 << globalhistBits;
 	gPred = (int*)malloc(gPred_length * sizeof(int));
 	for (int i = 0; i< gPred_length; i++) {

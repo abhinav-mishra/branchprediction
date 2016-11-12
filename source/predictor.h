@@ -28,11 +28,6 @@
 #define PERCEPTRON  4
 extern const char *predictorName[];
 
-#define StrongNT  0			// strong not taken
-#define WeakNT  1			// weak not taken
-#define WeakT  2			// weak taken
-#define StrongT  3			// strong taken
-
 // Predictor Configuration
 extern int globalhistBits;      // Number of bits for Global History
 extern int localhistBits;       // Number of bits for Local History
