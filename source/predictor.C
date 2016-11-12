@@ -125,14 +125,18 @@ void init_predictor_alpha21264()
 	bht_mask = bht_length - 1;
 	BHT = (int*)malloc(bht_length * sizeof(int));
 	for (int i = 0; i< bht_length; i++) {
-		BHT[i] = 1;
+		BHT[i] = 0;
 	}
 
 	choice_len = 1 << globalhistBits;
 	choice = (int*)malloc(choice_len * sizeof(int));
 	for (int i = 0; i< choice_len; i++) {
-		choice[i] = 1;
+		choice[i] = 0;
 	}
+    
+    sizeinbits = (pht_length*localhistBits)+(bht_length * 2)+(choice_len * 2 * 2)+(globalhistBits);
+    printf("sizeinbits = %d+%d = %d \n", (pht_length * localhistBits)+(bht_length * 2), (choice_len * 2 * 2), sizeinbits);
+
 }
 
 void init_predictor_perceptron()
@@ -196,10 +200,10 @@ bool make_prediction_alpha21264(unsigned int pc)
 	}
 
 	if (choice[index] > 1) {
-		return lResult;
+		return gResult;
 	}
 	else {
-		return gResult;
+		return lResult;
 	}
 }
 
@@ -298,10 +302,10 @@ void train_predictor_alpha21264(unsigned int pc, bool outcome)
 	int choiceAdd = GHR & (choice_len - 1);
 
 	if (gResult == outcome && lResult != outcome) {
-		choice[choiceAdd]--;
+		choice[choiceAdd]++;
 	}
 	else if (gResult != outcome && lResult == outcome) {
-		choice[choiceAdd]++;
+		choice[choiceAdd]--;
 	}
 
 	if (choice[choiceAdd] > 3) {
