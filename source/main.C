@@ -28,6 +28,7 @@ int handle_cmd_options(char *arg)
 	}
 	else if (!strncmp(arg, "--perceptron:", 13)) {
 		predictorType = PERCEPTRON;
+        sscanf(arg + 13, "%d:%d", &globalhistBits, &pcBits);
 	}
 	else {
 		return 0;

@@ -26,6 +26,10 @@
 #define LOCAL       2
 #define ALPHA21264  3
 #define PERCEPTRON  4
+
+// For perceptron
+#define SIZE_N 62
+
 extern const char *predictorName[];
 
 // Predictor Configuration
