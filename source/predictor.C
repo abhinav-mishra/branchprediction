@@ -24,6 +24,7 @@ void train_predictor_local(unsigned int pc, bool outcome);
 void train_predictor_alpha21264(unsigned int pc, bool outcome);
 void train_predictor_perceptron(unsigned int pc, bool outcome);
 
+void perceptron(int);
 
 //make predictions
 bool make_prediction_gshare(unsigned int pc);
@@ -40,6 +41,12 @@ int* BHT;
 int* PHT;
 int* gPred;
 int* choice;
+int** percep_weights; //For perceptron
+int* history; //For perceptron
+float y_perceptron = 0.0;
+int percep_length = 0;
+int percep_mask = 0;
+float theta = 0.0;
 
 int bht_mask = 0;
 int pht_mask = 0;
@@ -351,9 +358,39 @@ void train_predictor_alpha21264(unsigned int pc, bool outcome)
 	train_predictor_local(pc, outcome);
 }
 
+
+void perceptron(int iPercep)
+{
+    for (int i = 0; i< globalhistBits; i++) { 
+        y_perceptron += percep_weights[iPercep][i] * history[i];
+    }
+}
+
+int sign(float y) {
+    if (y < 0.0)
+        return -1;
+    else
+        return 1;
+}
+
 void train_predictor_perceptron(unsigned int pc, bool outcome)
 {
-//TODO
+    int result = -1;
+    if (outcome == TAKEN) {
+        result = TAKEN;
+    }
+    int indexPercep = pc & percep_mask;
+
+    if ((sign(y_perceptron) != result) || (abs(y_perceptron) <= theta)) {
+        for (int i = 0; i< globalhistBits; i++) {
+            percep_weights[indexPercep][i] = percep_weights[indexPercep][i] + (result * history[i]);
+        }
+    }
+    
+    for (int i = globalhistBits; i > 0; i--) {
+          history[i] = history[i-1];
+    }
+    history[0] = result;
 }
 
 
