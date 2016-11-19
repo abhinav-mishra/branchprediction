@@ -159,8 +159,22 @@ int init_predictor_alpha21264()
 
 int init_predictor_perceptron()
 {
-//TODO
-	return -1;
+    int sizeinbits = 0;
+    percep_length = 1 << pcBits;
+    theta = (1.93 * percep_length) + 14;
+    percep_mask = percep_length - 1;
+    percep_weights = (int **)malloc(percep_length * sizeof(int*));
+    for (int i = 0; i< percep_length; i++) {
+        percep_weights[i] = (int*)malloc(globalhistBits * sizeof(int));
+    }
+    
+    history = (int*)malloc(globalhistBits * sizeof(int));
+    for (int i = 0; i< globalhistBits; i++) {
+        history[i] = 0;
+    }
+
+    sizeinbits = (globalhistBits * percep_length * sizeof(int)) + globalhistBits;
+    printf("sizeinbits = %lu+%d = %d \n", (globalhistBits * percep_length * sizeof(int)), globalhistBits, sizeinbits);
 }
 
 bool make_prediction (unsigned int pc)
@@ -228,8 +242,11 @@ bool make_prediction_alpha21264(unsigned int pc)
 
 bool make_prediction_perceptron(unsigned int pc)
 {
-//TODO
-	return false;
+    int indexPercep = pc & percep_mask;
+    perceptron(indexPercep);
+    if (y_perceptron < 0)
+        return NOTTAKEN;
+    return TAKEN;
 }
 
 void train_predictor (unsigned int pc, bool outcome)
