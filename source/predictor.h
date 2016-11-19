@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 /*
   Define all your tables and their sizes here.
   All tables must be statically-sized.
@@ -40,12 +41,15 @@ extern int localhistBits;       // Number of bits for Local History
 extern int pcBits;              // Number of bits for PC index
 extern int predictorType;       // Branch Predictor Type
 
+extern unsigned long int budget;
 
-
+extern FILE * output_stream;
+extern char * input_filename;
+extern char * output_filename;
 /*
   Initialize the predictor.
 */
-void init_predictor ();
+int init_predictor ();
 
 /*
   Make a prediction for conditional branch instruction at PC 'pc'.

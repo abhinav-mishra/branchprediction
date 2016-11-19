@@ -12,10 +12,10 @@ int predictorType;  // Branch Predictor Type
 
 
 //intialize predictors
-void init_predictor_gshare();
-void init_predictor_local();
-void init_predictor_alpha21264();
-void init_predictor_perceptron();
+int init_predictor_gshare();
+int init_predictor_local();
+int init_predictor_alpha21264();
+int init_predictor_perceptron();
 
 
 //training
@@ -46,7 +46,7 @@ int* history; //For perceptron
 float y_perceptron = 0.0;
 int percep_length = 0;
 int percep_mask = 0;
-int theta = 0;
+float theta = 0.0;
 
 int bht_mask = 0;
 int pht_mask = 0;
@@ -55,29 +55,31 @@ int pht_length = 0;
 int gPred_length = 0;
 int choice_len = 0;
 
-void init_predictor ()
+int init_predictor ()
 {
 	switch (predictorType) {
 		case DEFAULT:
 			break;
 		case LOCAL:
-			init_predictor_local();
+			return init_predictor_local();
 			break;
 		case GSHARE:
-			init_predictor_gshare();
+			return init_predictor_gshare();
 			break;
 		case ALPHA21264:
-			init_predictor_alpha21264();
+			return init_predictor_alpha21264();
 			break;
 		case PERCEPTRON:
-			init_predictor_perceptron();
+			return init_predictor_perceptron();
 			break;
 		default:
+			return -1;
 			break;
 		}
+	return -1;
 }
 
-void init_predictor_local() 
+int init_predictor_local() 
 {
     int sizeinbits = 0;
     pht_length = 1 << pcBits;
@@ -96,9 +98,13 @@ void init_predictor_local()
 	}
     sizeinbits = (pht_length*localhistBits)+(bht_length * 2);
     printf("sizeinbits = %d+%d = %d \n", (pht_length * localhistBits), (bht_length * 2), sizeinbits);
+    printf("Percent of budget: %f\n",(float)sizeinbits/budget);
+    if (sizeinbits < budget)
+	    fprintf(output_stream, "Local\t%s\t\t%d\t%d\t%d\t%lu\t%f\t", input_filename, localhistBits, pcBits, sizeinbits, budget, (float)sizeinbits/budget*100);
+	return sizeinbits;
 }
 
-void init_predictor_gshare()
+int init_predictor_gshare()
 {
 	int sizeinbits = 0;
     GHR = 0;
@@ -110,9 +116,12 @@ void init_predictor_gshare()
 	}
     sizeinbits = (globalhistBits)+(bht_length * 2);
     printf("sizeinbits = %d+%d = %d \n", (globalhistBits), (bht_length * 2), sizeinbits);
+    if (sizeinbits < budget)
+	    fprintf(output_stream, "G-Share\t%s\t%d\t\t\t%d\t%lu\t%f\t", input_filename, globalhistBits, sizeinbits, budget, (float)sizeinbits/budget*100);
+	return sizeinbits;
 }
 
-void init_predictor_alpha21264()
+int init_predictor_alpha21264()
 {
 	int sizeinbits = 0;
     GHR = 0;
@@ -144,10 +153,12 @@ void init_predictor_alpha21264()
     
     sizeinbits = (pht_length*localhistBits)+(bht_length * 2)+(choice_len * 2 * 2)+(globalhistBits);
     printf("sizeinbits = %d+%d = %d \n", (pht_length * localhistBits)+(bht_length * 2), (choice_len * 2 * 2), sizeinbits);
-
+    if (sizeinbits < budget)
+	    fprintf(output_stream, "Alpha 21264\t%s\t%d\t%d\t%d\t%d\t%lu\t%f\t", input_filename, globalhistBits, localhistBits, pcBits, sizeinbits, budget, (float)sizeinbits/budget*100);
+	return sizeinbits;
 }
 
-void init_predictor_perceptron()
+int init_predictor_perceptron()
 {
     int sizeinbits = 0;
     percep_length = 1 << pcBits;
