@@ -399,7 +399,7 @@ void train_predictor_perceptron(unsigned int pc, bool outcome)
     }
     int indexPercep = pc & percep_mask;
 
-    if ((sign(y_perceptron) != result) || (abs(y_perceptron) <= theta)) {
+    if ((sign(y_perceptron) != result) || (fabs(y_perceptron) <= theta)) {
         for (int i = 0; i< globalhistBits; i++) {
             percep_weights[indexPercep][i] = percep_weights[indexPercep][i] + (result * history[i]);
         }
