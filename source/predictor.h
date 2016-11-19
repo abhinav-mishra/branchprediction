@@ -28,7 +28,9 @@
 #define PERCEPTRON  4
 
 // For perceptron
-#define SIZE_N 62
+#define BW  6
+#define MAX_WEIGHT ((1<<(BW-1))-1)
+#define MIN_WEIGHT (-MAX_WEIGHT-1)
 
 extern const char *predictorName[];
 

@@ -46,7 +46,7 @@ int* history; //For perceptron
 float y_perceptron = 0.0;
 int percep_length = 0;
 int percep_mask = 0;
-float theta = 0.0;
+int theta = 0;
 
 int bht_mask = 0;
 int pht_mask = 0;
@@ -82,11 +82,12 @@ void init_predictor_local()
     int sizeinbits = 0;
     pht_length = 1 << pcBits;
 	pht_mask = pht_length - 1;
-	PHT = (int*)malloc(pht_length * sizeof(int));
+	int localPHT[pht_length];
+    //PHT = &localPHT[0];//(int*)malloc(pht_length * sizeof(int));
 	for (int i = 0; i< pht_length; i++) {
-		PHT[i] = 0;
+		localPHT[i] = 0;
 	}
-
+    PHT = &localPHT[0];
 	bht_length = 1 << localhistBits;
 	bht_mask = bht_length - 1;
 	BHT = (int*)malloc(bht_length * sizeof(int));
@@ -150,20 +151,32 @@ void init_predictor_perceptron()
 {
     int sizeinbits = 0;
     percep_length = 1 << pcBits;
-    theta = (1.93 * percep_length) + 14;
+    theta = (1.93 * (globalhistBits)) + 14;
     percep_mask = percep_length - 1;
     percep_weights = (int **)malloc(percep_length * sizeof(int*));
     for (int i = 0; i< percep_length; i++) {
-        percep_weights[i] = (int*)malloc(globalhistBits * sizeof(int));
-    }
-    
-    history = (int*)malloc(globalhistBits * sizeof(int));
-    for (int i = 0; i< globalhistBits; i++) {
-        history[i] = 0;
+        percep_weights[i] = (int*)malloc((globalhistBits+1) * sizeof(int));
+        for (int j = 0; j <= globalhistBits; j++) {
+            percep_weights[i][j] = 0;
+        }
     }
 
-    sizeinbits = (globalhistBits * percep_length * sizeof(int)) + globalhistBits;
-    printf("sizeinbits = %lu+%d = %d \n", (globalhistBits * percep_length * sizeof(int)), globalhistBits, sizeinbits);
+    history = (int*)malloc(globalhistBits * sizeof(int));
+    for (int i = 0; i< globalhistBits; i++) {
+        history[i] = -1;
+    }
+
+    sizeinbits = ((globalhistBits+1) * percep_length * BW) + globalhistBits;
+    printf("sizeinbits = %d\n", sizeinbits);
+}
+
+int arrToint() {
+    int res = 0;
+    for (int i=0; i<globalhistBits; i++) {
+        if (history[i] == 1)
+            res += (1<<i);
+    }
+    return res;
 }
 
 bool make_prediction (unsigned int pc)
@@ -231,8 +244,13 @@ bool make_prediction_alpha21264(unsigned int pc)
 
 bool make_prediction_perceptron(unsigned int pc)
 {
-    int indexPercep = pc & percep_mask;
-    perceptron(indexPercep);
+    int ghr = arrToint();
+    int iPercep = (pc^ghr) & percep_mask;
+    y_perceptron = percep_weights[iPercep][globalhistBits];
+    for (int i = 0; i< globalhistBits; i++) { 
+        y_perceptron += percep_weights[iPercep][i] * history[i];
+    }
+    
     if (y_perceptron < 0)
         return NOTTAKEN;
     return TAKEN;
@@ -364,14 +382,6 @@ void train_predictor_alpha21264(unsigned int pc, bool outcome)
 	train_predictor_local(pc, outcome);
 }
 
-
-void perceptron(int iPercep)
-{
-    for (int i = 0; i< globalhistBits; i++) { 
-        y_perceptron += percep_weights[iPercep][i] * history[i];
-    }
-}
-
 int sign(float y) {
     if (y < 0.0)
         return -1;
@@ -385,11 +395,22 @@ void train_predictor_perceptron(unsigned int pc, bool outcome)
     if (outcome == TAKEN) {
         result = TAKEN;
     }
-    int indexPercep = pc & percep_mask;
 
+    int ghr = arrToint();
+    int indexPercep = (pc^ghr) & percep_mask;
+    
     if ((sign(y_perceptron) != result) || (abs(y_perceptron) <= theta)) {
+        percep_weights[indexPercep][globalhistBits] += result;
         for (int i = 0; i< globalhistBits; i++) {
-            percep_weights[indexPercep][i] = percep_weights[indexPercep][i] + (result * history[i]);
+            percep_weights[indexPercep][i] += (result * history[i]);
+        }
+    }
+            
+    for (int i = 0; i<= globalhistBits; i++) {
+        if (percep_weights[indexPercep][i] > MAX_WEIGHT) {
+            percep_weights[indexPercep][i] = MAX_WEIGHT;
+        } else if (percep_weights[indexPercep][i] < MIN_WEIGHT) {
+            percep_weights[indexPercep][i] = MIN_WEIGHT;
         }
     }
     
