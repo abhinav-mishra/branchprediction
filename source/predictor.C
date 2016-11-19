@@ -175,6 +175,7 @@ int init_predictor_perceptron()
 
     sizeinbits = (globalhistBits * percep_length * sizeof(int)) + globalhistBits;
     printf("sizeinbits = %lu+%d = %d \n", (globalhistBits * percep_length * sizeof(int)), globalhistBits, sizeinbits);
+    return sizeinbits;
 }
 
 bool make_prediction (unsigned int pc)
