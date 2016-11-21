@@ -9,9 +9,13 @@ int globalhistBits;	// Number of bits for Global History
 int localhistBits;	// Number of bits for Local History
 int pcBits;			// Number of bits for PC index
 int predictorType;  // Branch Predictor Type
-
+int budgetType;     // Budget Limit in K
 
 //intialize predictors
+void initializeBits_local();
+void initializeBits_gshare();
+void initializeBits_alpha21264();
+void initializeBits_perceptron();
 int init_predictor_gshare();
 int init_predictor_local();
 int init_predictor_alpha21264();
@@ -61,15 +65,19 @@ int init_predictor ()
 		case DEFAULT:
 			break;
 		case LOCAL:
+            //initializeBits_local();
 			return init_predictor_local();
 			break;
 		case GSHARE:
+            //initializeBits_gshare();
 			return init_predictor_gshare();
 			break;
 		case ALPHA21264:
+            //initializeBits_alpha21264();
 			return init_predictor_alpha21264();
 			break;
 		case PERCEPTRON:
+            //initializeBits_perceptron();
 			return init_predictor_perceptron();
 			break;
 		default:
@@ -79,23 +87,53 @@ int init_predictor ()
 	return -1;
 }
 
+void initializeBits_local()
+{
+    switch(budgetType) {
+        case _8K:
+            localhistBits = _8KLOCALHIST_local;
+            pcBits = _8KPCBITS_local;
+            break;
+        case _16K:
+            localhistBits = _16KLOCALHIST_local;
+            pcBits = _16KPCBITS_local;
+            break;
+        case _32K:
+            localhistBits = _32KLOCALHIST_local;
+            pcBits = _32KPCBITS_local;
+            break;
+        case _64K:
+            localhistBits = _64KLOCALHIST_local;
+            pcBits = _64KPCBITS_local;
+            break;
+        case _128K:
+            localhistBits = _128KLOCALHIST_local;
+            pcBits = _128KPCBITS_local;
+            break;
+        case _1M:
+            localhistBits = _1MLOCALHIST_local;
+            pcBits = _1MPCBITS_local;
+            break;
+    }
+}
+
 int init_predictor_local() 
 {
     int sizeinbits = 0;
     pht_length = 1 << pcBits;
 	pht_mask = pht_length - 1;
-	int localPHT[pht_length];
-    //PHT = &localPHT[0];//(int*)malloc(pht_length * sizeof(int));
+    PHT = (int*)malloc(pht_length * sizeof(int));
 	for (int i = 0; i< pht_length; i++) {
-		localPHT[i] = 0;
+		PHT[i] = 0;
 	}
-    PHT = &localPHT[0];
-	bht_length = 1 << localhistBits;
+	
+    bht_length = 1 << localhistBits;
 	bht_mask = bht_length - 1;
-	BHT = (int*)malloc(bht_length * sizeof(int));
+    BHT = (int*)malloc(bht_length * sizeof(int));
 	for (int i = 0; i< bht_length; i++) {
 		BHT[i] = 0;
 	}
+    
     sizeinbits = (pht_length*localhistBits)+(bht_length * 2);
     printf("sizeinbits = %d+%d = %d \n", (pht_length * localhistBits), (bht_length * 2), sizeinbits);
     printf("Percent of budget: %f\n",(float)sizeinbits/budget);
@@ -104,13 +142,37 @@ int init_predictor_local()
 	return sizeinbits;
 }
 
+void initializeBits_gshare()
+{
+    switch(budgetType) {
+        case _8K:
+            globalhistBits = _8KGLOBALHIST_gshare;
+            break;
+        case _16K:
+            globalhistBits = _16KGLOBALHIST_gshare;
+            break;
+        case _32K:
+            globalhistBits = _32KGLOBALHIST_gshare;
+            break;
+        case _64K:
+            globalhistBits = _64KGLOBALHIST_gshare;
+            break;
+        case _128K:
+            globalhistBits = _128KGLOBALHIST_gshare;
+            break;
+        case _1M:
+            globalhistBits = _1MGLOBALHIST_gshare;
+            break;
+    }
+}
+
 int init_predictor_gshare()
 {
 	int sizeinbits = 0;
     GHR = 0;
     bht_length = 1 << globalhistBits;
 	bht_mask = (1 << globalhistBits) - 1;
-	BHT = (int*)malloc(bht_length * sizeof(int));
+    BHT = (int*)malloc(bht_length * sizeof(int));
 	for (int i = 0; i< bht_length; i++) {
 		BHT[i] = 0;
 	}
@@ -119,6 +181,42 @@ int init_predictor_gshare()
     if (sizeinbits < budget)
 	    fprintf(output_stream, "G-Share\t%s\t%d\t\t\t%d\t%lu\t%f\t", input_filename, globalhistBits, sizeinbits, budget, (float)sizeinbits/budget*100);
 	return sizeinbits;
+}
+
+void initializeBits_alpha21264()
+{
+    switch(budgetType) {
+        case _8K:
+            globalhistBits = _8KGLOBALHIST_alpha;
+            localhistBits = _8KLOCALHIST_alpha;
+            pcBits = _8KPCBITS_alpha;
+            break;
+        case _16K:
+            globalhistBits = _16KGLOBALHIST_alpha;
+            localhistBits = _16KLOCALHIST_alpha;
+            pcBits = _16KPCBITS_alpha;
+            break;
+        case _32K:
+            globalhistBits = _32KGLOBALHIST_alpha;
+            localhistBits = _32KLOCALHIST_alpha;
+            pcBits = _32KPCBITS_alpha;
+            break;
+        case _64K:
+            globalhistBits = _64KGLOBALHIST_alpha;
+            localhistBits = _64KLOCALHIST_alpha;
+            pcBits = _64KPCBITS_alpha;
+            break;
+        case _128K:
+            globalhistBits = _128KGLOBALHIST_alpha;
+            localhistBits = _128KLOCALHIST_alpha;
+            pcBits = _128KPCBITS_alpha;
+            break;
+        case _1M:
+            globalhistBits = _1MGLOBALHIST_alpha;
+            localhistBits = _1MLOCALHIST_alpha;
+            pcBits = _1MPCBITS_alpha;
+            break;
+    }
 }
 
 int init_predictor_alpha21264()
@@ -156,6 +254,37 @@ int init_predictor_alpha21264()
     if (sizeinbits < budget)
 	    fprintf(output_stream, "Alpha 21264\t%s\t%d\t%d\t%d\t%d\t%lu\t%f\t", input_filename, globalhistBits, localhistBits, pcBits, sizeinbits, budget, (float)sizeinbits/budget*100);
 	return sizeinbits;
+}
+
+
+void initializeBits_perceptron()
+{
+    switch(budgetType) {
+        case _8K:
+            localhistBits = _8KLOCALHIST_percep;
+            pcBits = _8KPCBITS_percep;
+            break;
+        case _16K:
+            localhistBits = _16KLOCALHIST_percep;
+            pcBits = _16KPCBITS_percep;
+            break;
+        case _32K:
+            localhistBits = _32KLOCALHIST_percep;
+            pcBits = _32KPCBITS_percep;
+            break;
+        case _64K:
+            localhistBits = _64KLOCALHIST_percep;
+            pcBits = _64KPCBITS_percep;
+            break;
+        case _128K:
+            localhistBits = _128KLOCALHIST_percep;
+            pcBits = _128KPCBITS_percep;
+            break;
+        case _1M:
+            localhistBits = _1MLOCALHIST_percep;
+            pcBits = _1MPCBITS_percep;
+            break;
+    }
 }
 
 int init_predictor_perceptron()

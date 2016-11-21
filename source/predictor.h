@@ -46,6 +46,75 @@ extern unsigned long int budget;
 extern FILE * output_stream;
 extern char * input_filename;
 extern char * output_filename;
+
+
+//Budget Types
+#define _8K 8
+#define _16K 16
+#define _32K 32
+#define _64K 64
+#define _128K 128
+#define _1M 1024
+
+
+//Fixed bits for 2-Level Local Predictor
+#define _8KLOCALHIST_local 11
+#define _8KPCBITS_local 8
+#define _16KLOCALHIST_local 11
+#define _16KPCBITS_local  8
+#define _32KLOCALHIST_local  11
+#define _32KPCBITS_local  8
+#define _64KLOCALHIST_local  11
+#define _64KPCBITS_local  8
+#define _128KLOCALHIST_local  11
+#define _128KPCBITS_local 8
+#define _1MLOCALHIST_local  11
+#define _1MPCBITS_local  8
+
+
+//Fixed bits for G-share Predictor
+#define _8KGLOBALHIST_gshare 11
+#define _16KGLOBALHIST_gshare 11
+#define _32KGLOBALHIST_gshare  11
+#define _64KGLOBALHIST_gshare  11
+#define _128KGLOBALHIST_gshare  11
+#define _1MGLOBALHIST_gshare  11
+
+
+//Fixed bits for Alpha21264 Predictor
+#define _8KLOCALHIST_alpha 11
+#define _8KGLOBALHIST_alpha 11
+#define _8KPCBITS_alpha 8
+#define _16KLOCALHIST_alpha 11
+#define _16KGLOBALHIST_alpha 11
+#define _16KPCBITS_alpha  8
+#define _32KLOCALHIST_alpha  11
+#define _32KGLOBALHIST_alpha 11
+#define _32KPCBITS_alpha  8
+#define _64KLOCALHIST_alpha  11
+#define _64KGLOBALHIST_alpha 11
+#define _64KPCBITS_alpha  8
+#define _128KLOCALHIST_alpha  11
+#define _128KGLOBALHIST_alpha 11
+#define _128KPCBITS_alpha 8
+#define _1MLOCALHIST_alpha  11
+#define _1MGLOBALHIST_alpha 11
+#define _1MPCBITS_alpha  8
+
+//Fixed bits for Perceptron Predictor
+#define _8KLOCALHIST_percep 11
+#define _8KPCBITS_percep 8
+#define _16KLOCALHIST_percep 11
+#define _16KPCBITS_percep  8
+#define _32KLOCALHIST_percep  11
+#define _32KPCBITS_percep  8
+#define _64KLOCALHIST_percep  11
+#define _64KPCBITS_percep  8
+#define _128KLOCALHIST_percep  11
+#define _128KPCBITS_percep 8
+#define _1MLOCALHIST_percep  11
+#define _1MPCBITS_percep  8
+
 /*
   Initialize the predictor.
 */
