@@ -20,31 +20,40 @@ int handle_cmd_options(char *arg)
 	}
 	else if (!strncmp(arg, "--gshare:", 9)) {
 		predictorType = GSHARE;
-		sscanf(arg + 9, "%d", &globalhistBits);
+		sscanf(arg + 9, "%d", &budgetType);
 	}
 	else if (!strncmp(arg, "--local:", 8)) {
 		predictorType = LOCAL;
-		sscanf(arg + 8, "%d:%d", &localhistBits, &pcBits);
+		sscanf(arg + 8, "%d", &budgetType);
 	}
 	else if (!strncmp(arg, "--alpha21264:", 13)) {
 		predictorType = ALPHA21264;
-		sscanf(arg + 13, "%d:%d:%d", &globalhistBits, &localhistBits, &pcBits);
+		sscanf(arg + 13, "%d", &budgetType);
 	}
 	else if (!strncmp(arg, "--perceptron:", 13)) {
 		predictorType = PERCEPTRON;
-        sscanf(arg + 13, "%d:%d", &globalhistBits, &pcBits);
+        sscanf(arg + 13, "%d", &budgetType);
 	}
-  else if (!strncmp(arg, "--budget:", 9)) {
-    sscanf(arg + 9, "%lu", &budget);
-  }
-  // else if (!strncmp(arg, "--output:", 9)) {
-  //   sscanf(arg + 9, "%s", output_filename);
-  // }
 	else {
 		return 0;
 	}
 
 	return 1;
+}
+
+int assignBudget() {
+    if (budgetType == 8)
+        return 8256;
+    if (budgetType == 16)
+        return 16512;
+    if (budgetType == 32)
+        return 33024;
+    if (budgetType == 64)
+        return 66048;
+    if (budgetType == 128)
+        return 132096;
+    if (budgetType == 1024)
+        return 1052672;
 }
 
 void setup_trace (const char * filename)
@@ -101,6 +110,8 @@ int main (int argc, char * argv[])
       setup_output("experiment.csv");
 	  }
   }
+
+  budget = assignBudget();
   // Initialize the predictor
   int size = init_predictor ();
 

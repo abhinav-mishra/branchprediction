@@ -65,19 +65,19 @@ int init_predictor ()
 		case DEFAULT:
 			break;
 		case LOCAL:
-            //initializeBits_local();
+            initializeBits_local();
 			return init_predictor_local();
 			break;
 		case GSHARE:
-            //initializeBits_gshare();
+            initializeBits_gshare();
 			return init_predictor_gshare();
 			break;
 		case ALPHA21264:
-            //initializeBits_alpha21264();
+            initializeBits_alpha21264();
 			return init_predictor_alpha21264();
 			break;
 		case PERCEPTRON:
-            //initializeBits_perceptron();
+            initializeBits_perceptron();
 			return init_predictor_perceptron();
 			break;
 		default:
@@ -261,27 +261,27 @@ void initializeBits_perceptron()
 {
     switch(budgetType) {
         case _8K:
-            localhistBits = _8KLOCALHIST_percep;
+            globalhistBits = _8KGLOBALHIST_percep;
             pcBits = _8KPCBITS_percep;
             break;
         case _16K:
-            localhistBits = _16KLOCALHIST_percep;
+            globalhistBits = _16KGLOBALHIST_percep;
             pcBits = _16KPCBITS_percep;
             break;
         case _32K:
-            localhistBits = _32KLOCALHIST_percep;
+            globalhistBits = _32KGLOBALHIST_percep;
             pcBits = _32KPCBITS_percep;
             break;
         case _64K:
-            localhistBits = _64KLOCALHIST_percep;
+            globalhistBits = _64KGLOBALHIST_percep;
             pcBits = _64KPCBITS_percep;
             break;
         case _128K:
-            localhistBits = _128KLOCALHIST_percep;
+            globalhistBits = _128KGLOBALHIST_percep;
             pcBits = _128KPCBITS_percep;
             break;
         case _1M:
-            localhistBits = _1MLOCALHIST_percep;
+            globalhistBits = _1MGLOBALHIST_percep;
             pcBits = _1MPCBITS_percep;
             break;
     }
@@ -307,7 +307,7 @@ int init_predictor_perceptron()
     }
 
     sizeinbits = ((globalhistBits+1) * percep_length * BW) + globalhistBits;
-    printf("sizeinbits = %d\n", sizeinbits);
+    printf("sizeinbits = %d+%d = %d\n", ((globalhistBits+1) * percep_length * BW), globalhistBits, sizeinbits);
 }
 
 int arrToint() {

@@ -40,6 +40,7 @@ extern int globalhistBits;      // Number of bits for Global History
 extern int localhistBits;       // Number of bits for Local History
 extern int pcBits;              // Number of bits for PC index
 extern int predictorType;       // Branch Predictor Type
+extern int budgetType;          // Budget Limit in K
 
 extern unsigned long int budget;
 
@@ -58,62 +59,80 @@ extern char * output_filename;
 
 
 //Fixed bits for 2-Level Local Predictor
-#define _8KLOCALHIST_local 11
-#define _8KPCBITS_local 8
-#define _16KLOCALHIST_local 11
-#define _16KPCBITS_local  8
-#define _32KLOCALHIST_local  11
-#define _32KPCBITS_local  8
-#define _64KLOCALHIST_local  11
-#define _64KPCBITS_local  8
-#define _128KLOCALHIST_local  11
-#define _128KPCBITS_local 8
-#define _1MLOCALHIST_local  11
-#define _1MPCBITS_local  8
+#define _8KLOCALHIST_local 10
+#define _8KPCBITS_local 9
 
+#define _16KLOCALHIST_local 11 
+#define _16KPCBITS_local 10 
 
+#define _32KLOCALHIST_local 12 
+#define _32KPCBITS_local 11 
+
+#define _64KLOCALHIST_local 12
+#define _64KPCBITS_local 12 
+
+#define _128KLOCALHIST_local 13
+#define _128KPCBITS_local 13 
+
+#define _1MLOCALHIST_local 17 
+#define _1MPCBITS_local 15
+    
 //Fixed bits for G-share Predictor
-#define _8KGLOBALHIST_gshare 11
-#define _16KGLOBALHIST_gshare 11
-#define _32KGLOBALHIST_gshare  11
-#define _64KGLOBALHIST_gshare  11
-#define _128KGLOBALHIST_gshare  11
-#define _1MGLOBALHIST_gshare  11
+#define _8KGLOBALHIST_gshare 12 
 
+#define _16KGLOBALHIST_gshare 13 
+
+#define _32KGLOBALHIST_gshare 14 
+
+#define _64KGLOBALHIST_gshare 15 
+
+#define _128KGLOBALHIST_gshare 16 
+
+#define _1MGLOBALHIST_gshare 19
 
 //Fixed bits for Alpha21264 Predictor
-#define _8KLOCALHIST_alpha 11
-#define _8KGLOBALHIST_alpha 11
-#define _8KPCBITS_alpha 8
-#define _16KLOCALHIST_alpha 11
-#define _16KGLOBALHIST_alpha 11
-#define _16KPCBITS_alpha  8
-#define _32KLOCALHIST_alpha  11
-#define _32KGLOBALHIST_alpha 11
-#define _32KPCBITS_alpha  8
-#define _64KLOCALHIST_alpha  11
-#define _64KGLOBALHIST_alpha 11
-#define _64KPCBITS_alpha  8
-#define _128KLOCALHIST_alpha  11
-#define _128KGLOBALHIST_alpha 11
-#define _128KPCBITS_alpha 8
-#define _1MLOCALHIST_alpha  11
-#define _1MGLOBALHIST_alpha 11
-#define _1MPCBITS_alpha  8
+#define _8KLOCALHIST_alpha 4 
+#define _8KGLOBALHIST_alpha 10
+#define _8KPCBITS_alpha 10 
+
+#define _16KLOCALHIST_alpha 10 
+#define _16KGLOBALHIST_alpha 11 
+#define _16KPCBITS_alpha  9
+
+#define _32KLOCALHIST_alpha  11 
+#define _32KGLOBALHIST_alpha 12 
+#define _32KPCBITS_alpha  10 
+
+#define _64KLOCALHIST_alpha  12 
+#define _64KGLOBALHIST_alpha 13
+#define _64KPCBITS_alpha  11 
+
+#define _128KLOCALHIST_alpha  14 
+#define _128KGLOBALHIST_alpha 13 
+#define _128KPCBITS_alpha 12 
+
+#define _1MLOCALHIST_alpha  16 
+#define _1MGLOBALHIST_alpha 16 
+#define _1MPCBITS_alpha  15
 
 //Fixed bits for Perceptron Predictor
-#define _8KLOCALHIST_percep 11
-#define _8KPCBITS_percep 8
-#define _16KLOCALHIST_percep 11
-#define _16KPCBITS_percep  8
-#define _32KLOCALHIST_percep  11
-#define _32KPCBITS_percep  8
-#define _64KLOCALHIST_percep  11
-#define _64KPCBITS_percep  8
-#define _128KLOCALHIST_percep  11
-#define _128KPCBITS_percep 8
-#define _1MLOCALHIST_percep  11
-#define _1MPCBITS_percep  8
+#define _8KGLOBALHIST_percep 9 
+#define _8KPCBITS_percep 7
+
+#define _16KGLOBALHIST_percep 20
+#define _16KPCBITS_percep 7 
+
+#define _32KGLOBALHIST_percep 20
+#define _32KPCBITS_percep 8 
+
+#define _64KGLOBALHIST_percep 20 
+#define _64KPCBITS_percep 9 
+
+#define _128KGLOBALHIST_percep 32 
+#define _128KPCBITS_percep 9 
+
+#define _1MGLOBALHIST_percep  34
+#define _1MPCBITS_percep 12
 
 /*
   Initialize the predictor.
