@@ -32,3 +32,5 @@ source/predictor
 # Debug files
 *.dSYM/
 *.su
+
+source/experiment.csv
