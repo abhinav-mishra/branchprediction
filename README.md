@@ -6,10 +6,13 @@ How to run all predictors for all budget sizes for all traces:
 
 How to run a particular predictor:
 
-   Step 1. make clean
-   Step 2. make
-   Step 3. ./predictor --<predictor>:<budget> <filename>
-   Step 4. Example: ./predictor --local:128 ../traces/DIST-INT-1 
+        Step 1. make clean
+
+        Step 2. make
+        
+        Step 3. ./predictor --<predictor>:<budget> <filename>
+        
+        Step 4. Example: ./predictor --local:128 ../traces/DIST-INT-1 
 
 Usage Help:
 
