@@ -1,14 +1,13 @@
-# branchprediction
-For CSE240A project
+# CSE240A project - Branch Prediction
 
 How to run all predictors for all budget sizes for all traces:
-./runAllPredictors.sh
+    ./runAllPredictors.sh
 
 How to run a particular predictor:
-1. make clean
-2. make
-3. ./predictor --<predictor>:<budget> <filename>
-4. Example: ./predictor --local:128 ../traces/DIST-INT-1 
+    1. make clean
+    2. make
+    3. ./predictor --<predictor>:<budget> <filename>
+    4. Example: ./predictor --local:128 ../traces/DIST-INT-1 
 
 Usage Help:
 
