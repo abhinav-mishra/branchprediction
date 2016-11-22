@@ -48,7 +48,6 @@ extern FILE * output_stream;
 extern char * input_filename;
 extern char * output_filename;
 
-
 //Budget Types
 #define _8K 8
 #define _16K 16
