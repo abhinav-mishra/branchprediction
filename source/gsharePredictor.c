@@ -48,7 +48,7 @@ int init_predictor_gshare()
 		BHT[i] = 0;
 	}
     sizeinbits = (globalhistBits)+(bht_length * 2);
-    printf("sizeinbits = %d+%d = %d \n", (globalhistBits), (bht_length * 2), sizeinbits);
+    printf("Size in bits used = %d+%d = %d \n", (globalhistBits), (bht_length * 2), sizeinbits);
     if (sizeinbits < budget)
 	    fprintf(output_stream, "G-Share\t%s\t%d\t\t\t%d\t%lu\t%f\t", input_filename, globalhistBits, sizeinbits, budget, (float)sizeinbits/budget*100);
 	return sizeinbits;

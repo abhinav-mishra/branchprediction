@@ -62,7 +62,7 @@ int init_predictor_local()
     
     // calculating size used
     sizeinbits = (pht_length*localhistBits)+(bht_length * 2);
-    printf("sizeinbits = %d+%d = %d \n", (pht_length * localhistBits), (bht_length * 2), sizeinbits);
+    printf("Size in bits used = %d+%d = %d \n", (pht_length * localhistBits), (bht_length * 2), sizeinbits);
     printf("Percent of budget: %f\n",(float)sizeinbits/budget);
     if (sizeinbits < budget)
 	    fprintf(output_stream, "Local\t%s\t\t%d\t%d\t%d\t%lu\t%f\t", input_filename, localhistBits, pcBits, sizeinbits, budget, (float)sizeinbits/budget*100);

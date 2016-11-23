@@ -69,7 +69,8 @@ int init_predictor_perceptron()
     }
 
     sizeinbits = ((globalhistBits+1) * percep_length * BW) + globalhistBits;
-    printf("sizeinbits = %d+%d = %d\n", ((globalhistBits+1) * percep_length * BW), globalhistBits, sizeinbits);
+    printf("Size in bits used = %d+%d = %d\n", ((globalhistBits+1) * percep_length * BW), globalhistBits, sizeinbits);
+    return sizeinbits;
 }
 
 // For getting ghr from history table

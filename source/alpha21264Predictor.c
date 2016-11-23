@@ -96,7 +96,7 @@ int init_predictor_alpha21264()
 	}
     
     sizeinbits = (pht_length*localhistBits)+(bht_length * 2)+(choice_len * 2 * 2)+(globalhistBits);
-    printf("sizeinbits = %d+%d = %d \n", (pht_length * localhistBits)+(bht_length * 2), (choice_len * 2 * 2), sizeinbits);
+    printf("Size in bits used = %d+%d = %d \n", (pht_length * localhistBits)+(bht_length * 2), (choice_len * 2 * 2), sizeinbits);
     if (sizeinbits < budget)
 	    fprintf(output_stream, "Alpha 21264\t%s\t%d\t%d\t%d\t%d\t%lu\t%f\t", input_filename, globalhistBits, localhistBits, pcBits, sizeinbits, budget, (float)sizeinbits/budget*100);
 	return sizeinbits;
