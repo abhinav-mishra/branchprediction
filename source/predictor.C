@@ -2,9 +2,6 @@
 #include <stdio.h>
 #include <math.h>
 
-const char *predictorName[5] = { "Static", "Gshare", "Local",
-"Alpha21264", "Perceptron" };
-
 int globalhistBits;	// Number of bits for Global History
 int localhistBits;	// Number of bits for Local History
 int pcBits;			// Number of bits for PC index
@@ -37,12 +34,12 @@ extern bool make_prediction_perceptron(unsigned int pc);
 // Predictor Data Structures
 int GHR = 0;
 
-int* BHT;
-int* PHT;
-int* gPred;
-int* choice;
+int* BHT;   // Branch History Table
+int* PHT;   // Pattern History Table
+int* gPred; // Global predictor
+int* choice; // For making choice between global and local in Alpha
 int** percep_weights; //For perceptron
-int* history; //For perceptron
+int* history; //For perceptron history bits (-1 or 1)
 float y_perceptron = 0.0;
 int percep_length = 0;
 int percep_mask = 0;
@@ -55,6 +52,7 @@ int pht_length = 0;
 int gPred_length = 0;
 int choice_len = 0;
 
+// Initializing the right predictor
 int init_predictor ()
 {
 	switch (predictorType) {
@@ -83,6 +81,7 @@ int init_predictor ()
 	return -1;
 }
 
+// Choosing the predictor for making predictions
 bool make_prediction (unsigned int pc)
 {
 	switch (predictorType) {
@@ -103,6 +102,7 @@ bool make_prediction (unsigned int pc)
 	return NOTTAKEN;
 }
 
+// Training the right predictor 
 void train_predictor (unsigned int pc, bool outcome)
 {
 	switch (predictorType) {

@@ -16,8 +16,10 @@ extern int pht_length;
 extern int gPred_length;
 extern int choice_len;
 
+// For local predictions using 2-level predictor already created
 extern void train_predictor_local(unsigned int pc, bool outcome);
 
+//Assigning statically local/global history bits and pc bits
 void initializeBits_alpha21264()
 {
     switch(budgetType) {
@@ -58,26 +60,35 @@ int init_predictor_alpha21264()
 {
 	int sizeinbits = 0;
     GHR = 0;
+
+    // Calculating size of global predictor from global history bits
 	gPred_length = 1 << globalhistBits;
 	gPred = (int*)malloc(gPred_length * sizeof(int));
 	for (int i = 0; i< gPred_length; i++) {
 		gPred[i] = 1;
 	}
 
+    // Calculating size of PHT from pc bits
 	pht_length = 1 << pcBits;
 	pht_mask = pht_length - 1;
+
+    // Creating pattern table from static value
 	PHT = (int*)malloc(pht_length * sizeof(int));
 	for (int i = 0; i< pht_length; i++) {
 		PHT[i] = 0;
 	}
 
+    // Calculating size of BHT from local history bits 
 	bht_length = 1 << localhistBits;
 	bht_mask = bht_length - 1;
+
+    // Creating branch table from static value
 	BHT = (int*)malloc(bht_length * sizeof(int));
 	for (int i = 0; i< bht_length; i++) {
 		BHT[i] = 0;
 	}
 
+    // Calculating size of choice predictor from global history bits
 	choice_len = 1 << globalhistBits;
 	choice = (int*)malloc(choice_len * sizeof(int));
 	for (int i = 0; i< choice_len; i++) {
@@ -107,6 +118,7 @@ bool make_prediction_alpha21264(unsigned int pc)
 		gResult = TAKEN;
 	}
 
+    // Making a choice by using 2-bit counter between global and local result
 	if (choice[index] > 1) {
 		return gResult;
 	}
@@ -117,13 +129,15 @@ bool make_prediction_alpha21264(unsigned int pc)
 
 void train_predictor_alpha21264(unsigned int pc, bool outcome)
 {
-	int lResult = NOTTAKEN;
+	// Calculating local result
+    int lResult = NOTTAKEN;
 	int iPHT = pc & pht_mask;
 	int iBHT = PHT[iPHT] & bht_mask;
 	if (BHT[iBHT] > 1) {
 		lResult = TAKEN;
 	}
 
+    // Calculating global result
 	int gResult = NOTTAKEN;
 	int index = GHR & (choice_len - 1);
 
@@ -131,6 +145,7 @@ void train_predictor_alpha21264(unsigned int pc, bool outcome)
 		gResult = TAKEN;
 	}
 
+    // Getting choice and global predictor index from GHR
 	int choiceAdd = GHR & (choice_len - 1);
 
 	if (gResult == outcome && lResult != outcome) {
@@ -140,6 +155,7 @@ void train_predictor_alpha21264(unsigned int pc, bool outcome)
 		choice[choiceAdd]--;
 	}
 
+    // Restricting choice to 2-bit
 	if (choice[choiceAdd] > 3) {
 		choice[choiceAdd] = 3;
 	}
@@ -147,6 +163,7 @@ void train_predictor_alpha21264(unsigned int pc, bool outcome)
 		choice[choiceAdd] = 0;
 	}
 
+    // Updating global based on outcome
 	if (outcome == TAKEN) {
 		gPred[choiceAdd]++;
 	}
@@ -154,6 +171,7 @@ void train_predictor_alpha21264(unsigned int pc, bool outcome)
 		gPred[choiceAdd]--;
 	}
 
+    // Restricting global to 2-bit
 	if (gPred[choiceAdd] > 3) {
 		gPred[choiceAdd] = 3;
 	}
@@ -161,12 +179,14 @@ void train_predictor_alpha21264(unsigned int pc, bool outcome)
 		gPred[choiceAdd] = 0;
 	}
 
+    // Shifting and updating GHR
 	GHR <<= 1;
 	GHR &= (choice_len - 1);
 	if (outcome == TAKEN) {
 		GHR += 1;
 	}
 
+    // Updating local predictor
 	train_predictor_local(pc, outcome);
 }
 

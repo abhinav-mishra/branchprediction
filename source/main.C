@@ -11,9 +11,9 @@ char * input_filename;
 char * output_filename;
 unsigned long int budget;
 
-// Process the predictor option and number of bits
+// Process the predictor type option with budget type
 // Returns 1 if Successful
-int handle_cmd_options(char *arg)
+int handleCmdLineOptions(char *arg)
 {
 	if (!strcmp(arg, "--static")) {
 		predictorType = DEFAULT;
@@ -41,6 +41,7 @@ int handle_cmd_options(char *arg)
 	return 1;
 }
 
+// For getting the budget bits for calculating % budget used
 int assignBudget() {
     if (budgetType == 8)
         return 8256;
@@ -77,7 +78,6 @@ void setup_output (const char * filename)
   else {
     output_stream = fopen (filename, "a");
   }
-  //fprintf(output_stream, "Predictor\tInput\tGlobal History Bits\tLocal History Bits\tPC Bits\tTotal Budget\tBranches\tIncorrect\tMisprediction Rate\n");
 }
 
 void close_output ()
@@ -93,13 +93,12 @@ int main (int argc, char * argv[])
   uint32_t pc = 0;
   bool outcome = false;
 
-  // Set default
   predictorType = DEFAULT;
 
-  // Process cmdline Arguments
+  // Process command line arguments
   for (int i = 1; i < argc; ++i) {
 	  if (!strncmp(argv[i], "--", 2)) {
-		  if (!handle_cmd_options(argv[i])) {
+		  if (!handleCmdLineOptions(argv[i])) {
 			  printf("Unrecognized option %s\n", argv[i]);
 			  exit(1);
 		  }
@@ -111,6 +110,7 @@ int main (int argc, char * argv[])
 	  }
   }
 
+  // Get budget size in bits
   budget = assignBudget();
   // Initialize the predictor
   int size = init_predictor ();
@@ -129,7 +129,7 @@ int main (int argc, char * argv[])
     pc = ntohl (pc);
 
     num_branches ++;
-    //printf("%x %d\n",pc, outcome);    
+    
     // Make a prediction and compare with actual outcome
     if (make_prediction (pc) != outcome)
       mis_preds ++;

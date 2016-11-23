@@ -9,6 +9,7 @@ extern int pht_mask;
 extern int bht_length;
 extern int pht_length;
 
+//Assigning statically local history bits and pc bits
 void initializeBits_local()
 {
     switch(budgetType) {
@@ -42,13 +43,16 @@ void initializeBits_local()
 int init_predictor_local() 
 {
     int sizeinbits = 0;
-    pht_length = 1 << pcBits;
+    pht_length = 1 << pcBits; // calculating size of table
 	pht_mask = pht_length - 1;
+
+    // Creating pattern table from static value
     PHT = (int*)malloc(pht_length * sizeof(int));
 	for (int i = 0; i< pht_length; i++) {
 		PHT[i] = 0;
 	}
 	
+    // Creating branch table from static value
     bht_length = 1 << localhistBits;
 	bht_mask = bht_length - 1;
     BHT = (int*)malloc(bht_length * sizeof(int));
@@ -56,6 +60,7 @@ int init_predictor_local()
 		BHT[i] = 0;
 	}
     
+    // calculating size used
     sizeinbits = (pht_length*localhistBits)+(bht_length * 2);
     printf("sizeinbits = %d+%d = %d \n", (pht_length * localhistBits), (bht_length * 2), sizeinbits);
     printf("Percent of budget: %f\n",(float)sizeinbits/budget);
@@ -64,6 +69,7 @@ int init_predictor_local()
 	return sizeinbits;
 }
 
+// Getting indexes 2 level and making prediction
 bool make_prediction_local(unsigned int pc) {
 	int iPHT = pc & pht_mask;
 	int iBHT = PHT[iPHT] & bht_mask;
@@ -84,7 +90,8 @@ void train_predictor_local(unsigned int pc, bool outcome) {
 	else {
 		BHT[iBHT]--;
 	}
-
+    
+    // restricting saturating counters to 2 bit
 	if (BHT[iBHT] > 3) {
 		BHT[iBHT] = 3;
 	}
@@ -92,6 +99,7 @@ void train_predictor_local(unsigned int pc, bool outcome) {
 		BHT[iBHT] = 0;
 	}
 
+    // updating PHT
 	PHT[iPHT] <<= 1;
 	PHT[iPHT] &= bht_mask;
 	if (outcome == TAKEN) {

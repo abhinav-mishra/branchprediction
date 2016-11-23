@@ -5,18 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-/*
-  Define all your tables and their sizes here.
-  All tables must be statically-sized.
-  Please don't call malloc () or any of its relatives within your
-  program.  The predictor will have a budget, namely (32K + 256) bits
-  (not bytes).  That encompasses all storage (all tables, plus GHR, if
-  necessary -- but not PC) used for the predictor.  That may not be
-  the amount of storage your predictor uses, however -- for example,
-  you may implement 2-bit predictors with a table of ints, in which
-  case the simulator will use more memory -- that's okay, we're only
-  concerned about the memory used by the simulated branch predictor.
-*/
 
 #define NOTTAKEN  false
 #define TAKEN     true
@@ -29,13 +17,11 @@
 #define PERCEPTRON  4
 
 // For perceptron
-#define BW  6
+#define BW  6 //bit width
 #define MAX_WEIGHT ((1<<(BW-1))-1)
 #define MIN_WEIGHT (-MAX_WEIGHT-1)
 
-extern const char *predictorName[];
-
-// Predictor Configuration
+// Predictor Config
 extern int globalhistBits;      // Number of bits for Global History
 extern int localhistBits;       // Number of bits for Local History
 extern int pcBits;              // Number of bits for PC index
@@ -48,7 +34,7 @@ extern FILE * output_stream;
 extern char * input_filename;
 extern char * output_filename;
 
-//Budget Types
+// Budget Types
 #define _8K 8
 #define _16K 16
 #define _32K 32
@@ -57,7 +43,7 @@ extern char * output_filename;
 #define _1M 1024
 
 
-//Fixed bits for 2-Level Local Predictor
+// Fixed bits for 2-Level Local Predictor
 #define _8KLOCALHIST_local 10
 #define _8KPCBITS_local 9
 
@@ -76,7 +62,7 @@ extern char * output_filename;
 #define _1MLOCALHIST_local 17 
 #define _1MPCBITS_local 15
     
-//Fixed bits for G-share Predictor
+// Fixed bits for G-share Predictor
 #define _8KGLOBALHIST_gshare 12 
 
 #define _16KGLOBALHIST_gshare 13 
@@ -89,7 +75,7 @@ extern char * output_filename;
 
 #define _1MGLOBALHIST_gshare 19
 
-//Fixed bits for Alpha21264 Predictor
+// Fixed bits for Alpha21264 Predictor
 #define _8KLOCALHIST_alpha 4 
 #define _8KGLOBALHIST_alpha 10
 #define _8KPCBITS_alpha 10 
@@ -114,7 +100,7 @@ extern char * output_filename;
 #define _1MGLOBALHIST_alpha 16 
 #define _1MPCBITS_alpha  15
 
-//Fixed bits for Perceptron Predictor
+// Fixed bits for Perceptron Predictor
 #define _8KGLOBALHIST_percep 9 
 #define _8KPCBITS_percep 7
 

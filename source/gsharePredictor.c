@@ -8,6 +8,8 @@ extern int *BHT;
 extern int bht_mask;
 extern int bht_length;
 
+
+// Assigning global history bits from static value
 void initializeBits_gshare()
 {
     switch(budgetType) {
@@ -32,12 +34,15 @@ void initializeBits_gshare()
     }
 }
 
+
 int init_predictor_gshare()
 {
 	int sizeinbits = 0;
     GHR = 0;
-    bht_length = 1 << globalhistBits;
+    bht_length = 1 << globalhistBits; // Size of BHT from global history bits
 	bht_mask = (1 << globalhistBits) - 1;
+
+    // Creating branch table from static value
     BHT = (int*)malloc(bht_length * sizeof(int));
 	for (int i = 0; i< bht_length; i++) {
 		BHT[i] = 0;
@@ -51,7 +56,7 @@ int init_predictor_gshare()
 
 bool make_prediction_gshare(unsigned int pc)
 {
-	int xr = (GHR^pc) & bht_mask;
+	int xr = (GHR^pc) & bht_mask; // Getting index by xoring with pc
 	if (BHT[xr] > 1) {
 		return TAKEN;
 	}
@@ -68,6 +73,7 @@ void train_predictor_gshare(unsigned int pc, bool outcome)
 		BHT[xr]--;
 	}
 
+    // restricting saturating counters to 2 bit
 	if (BHT[xr] > 3) {
 		BHT[xr] = 3;
 	}
@@ -75,6 +81,7 @@ void train_predictor_gshare(unsigned int pc, bool outcome)
 		BHT[xr] = 0;
 	}
 
+    // Shifting and updating GHR
 	GHR <<= 1;
 	GHR &= bht_mask;
 	if (outcome == TAKEN) {
